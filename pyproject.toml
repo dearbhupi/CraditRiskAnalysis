@@ -1,0 +1,14 @@
+[project]
+name = "target-mlproject"
+version = "0.1.0"
+description = "Machine learning project for credit risk analysis"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "jupyterlab>=4.4.10",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.7.2",
+    "streamlit>=1.51.0",
+]
