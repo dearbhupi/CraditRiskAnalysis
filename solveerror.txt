@@ -1,0 +1,17 @@
+(Target_MLProject) bhupi@macbookpro Target_MLProject % history
+  316  python3 -v
+  317  pip install -r requirements.txt
+  318  pip install --upgrade pip
+  319  source /Users/bhupi/vscodeProjects/Target_MLProject/.venv/bin/activate
+  320  brew install libomp
+  321  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  322  brew install libomp
+  323  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+  324  eval "$(/opt/homebrew/bin/brew shellenv)"
+  325  brew --version
+  326  brew install libomp
+  327  ls /opt/homebrew/opt/libomp/lib/libomp.dylib
+  328  export DYLD_LIBRARY_PATH="/opt/homebrew/opt/libomp/lib:$DYLD_LIBRARY_PATH"
+  329  export DYLD_LIBRARY_PATH="/opt/homebrew/opt/libomp/lib:$DYLD_LIBRARY_PATH"
+  330  source /Users/bhupi/vscodeProjects/Target_MLProject/.venv/bin/activate
+  331  export DYLD_LIBRARY_PATH="/opt/homebrew/opt/libomp/lib:$DYLD_LIBRARY_PATH"
