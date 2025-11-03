@@ -44,4 +44,4 @@ if st.button("Predict Risk"):
     else:
         st.error(f"The predicted credit risk is **BAD**")
 
-"""Copyright Bhupinder Singh @2025"""
+"""Bhupinder Singh @2025"""
