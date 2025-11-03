@@ -6,114 +6,89 @@ import json
 import bcrypt
 import os
 
-# ------------------- Page Config -------------------
-st.set_page_config(page_title="Credit Risk Predictor", page_icon="🔒", layout="centered")
+# -------------------------------------------------
+# Page config
+# -------------------------------------------------
+st.set_page_config(
+    page_title="Credit Risk Predictor",
+    page_icon="chart_with_upwards_trend",
+    layout="centered"
+)
 
-# ------------------- Custom CSS -------------------
+# -------------------------------------------------
+# Professional CSS (blue & white)
+# -------------------------------------------------
 st.markdown("""
 <style>
-    .main {
-        background-color: #f8f9fa;
-    }
-    .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
+    /* Global */
+    .main {background:#f5f7fa;}
+    .stApp {background:#ffffff; color:#212529;}
+
+    /* Header */
     .title {
-        font-size: 3rem !important;
-        font-weight: 700;
-        text-align: center;
-        background: linear-gradient(to right, #FFD700, #FF6347);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
+        font-size:2.8rem; font-weight:700; text-align:center;
+        background:linear-gradient(90deg,#0d6efd,#0062cc);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        margin-bottom:0.4rem;
     }
-    .subtitle {
-        text-align: center;
-        color: #e0e0e0;
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
+    .subtitle {text-align:center; color:#6c757d; font-size:1.1rem; margin-bottom:2rem;}
+
+    /* Cards */
+    .card {
+        background:#ffffff; padding:1.5rem; border-radius:12px;
+        box-shadow:0 4px 12px rgba(0,0,0,0.07); border:1px solid #e9ecef;
     }
     .metric-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        text-align: center;
-        color: #333;
-        font-weight: bold;
-        font-size: 1.3rem;
+        background:#f8f9fa; padding:1.2rem; border-radius:10px;
+        text-align:center; font-weight:600; color:#495057;
+        border-left:4px solid #0d6efd;
     }
+
+    /* Result boxes */
     .risk-good {
-        background: linear-gradient(120deg, #84fab0, #8fd3f4);
-        color: white;
-        padding: 1.5rem;
-        border-radius: 15px;
-        text-align: center;
-        font-size: 1.8rem;
-        font-weight: bold;
-        box-shadow: 0 8px 20px rgba(132, 250, 176, 0.4);
+        background:#e6f4ea; color:#155724; padding:1.5rem;
+        border-radius:10px; text-align:center; font-size:1.6rem; font-weight:600;
+        border:1px solid #c3e6cb;
     }
     .risk-bad {
-        background: linear-gradient(120deg, #ff9a9e, #fad0c4);
-        color: white;
-        padding: 1.5rem;
-        border-radius: 15px;
-        text-align: center;
-        font-size: 1.8rem;
-        font-weight: bold;
-        box-shadow: 0 8px 20px rgba(255, 154, 158, 0.4);
+        background:#f8d7da; color:#721c24; padding:1.5rem;
+        border-radius:10px; text-align:center; font-size:1.6rem; font-weight:600;
+        border:1px solid #f5c6cb;
     }
+
+    /* Buttons */
     .stButton>button {
-        background: #FFD700;
-        color: black;
-        font-weight: bold;
-        border-radius: 12px;
-        height: 3em;
-        width: 100%;
-        font-size: 1.2rem;
-        transition: all 0.3s;
+        background:#0d6efd; color:#fff; font-weight:600;
+        border:none; border-radius:8px; height:3rem;
+        transition:all .2s;
     }
     .stButton>button:hover {
-        background: #FFC107;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        background:#0b5ed7; box-shadow:0 4px 8px rgba(13,110,253,.3);
     }
-    .input-card {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 1.5rem;
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        margin-bottom: 1rem;
-    }
-    .footer {
-        text-align: center;
-        margin-top: 3rem;
-        color: #ccc;
-        font-size: 0.9rem;
-    }
+
+    /* Sidebar */
+    .css-1d391kg {padding-top:1.5rem;}
+    .css-1v0mbdj {font-weight:600; color:#0d6efd;}
+
+    /* Login box */
     .login-box {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        max-width: 400px;
-        margin: 0 auto;
+        background:#fff; padding:2rem; border-radius:12px;
+        max-width:380px; margin:auto; box-shadow:0 6px 20px rgba(0,0,0,.1);
     }
-    .logout-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
+    .logout-btn {position:absolute; top:12px; right:12px;}
+
+    /* Footer */
+    .footer {text-align:center; margin-top:3rem; color:#6c757d; font-size:0.9rem;}
 </style>
 """, unsafe_allow_html=True)
 
 
-# ------------------- Load Users -------------------
+# -------------------------------------------------
+# Load users (hashed)
+# -------------------------------------------------
 def load_users():
     if not os.path.exists("users.json"):
-        st.error("users.json not found! Create it with hashed passwords.")
+        st.error("users.json missing – create it with hashed passwords.")
         st.stop()
     with open("users.json") as f:
         return json.load(f)
@@ -122,30 +97,32 @@ def load_users():
 USERS = load_users()
 
 
-# ------------------- Authentication -------------------
 def check_login(username, password):
-    for user in USERS:
-        if user["username"] == username:
-            return bcrypt.checkpw(password.encode(), user["password"].encode())
+    for u in USERS:
+        if u["username"] == username:
+            return bcrypt.checkpw(password.encode(), u["password"].encode())
     return False
 
 
-# Session state
+# -------------------------------------------------
+# Session handling
+# -------------------------------------------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "username" not in st.session_state:
     st.session_state.username = ""
 
-# ------------------- Login Page -------------------
+# -------------------------------------------------
+# LOGIN PAGE
+# -------------------------------------------------
 if not st.session_state.logged_in:
-    st.markdown('<h1 class="title">🔐 Secure Login</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="subtitle">Enter your credentials to access the Credit Risk Predictor</p>',
-                unsafe_allow_html=True)
+    st.markdown('<h1 class="title">Login</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="subtitle">Enter credentials to access the predictor</p>', unsafe_allow_html=True)
 
     with st.container():
-        st.markdown('<div class="login-box">', unsafe_allow_html=True)
-        username = st.text_input("Username", placeholder="Enter username")
-        password = st.text_input("Password", type="password", placeholder="Enter password")
+
+        username = st.text_input("Username", placeholder="username")
+        password = st.text_input("Password", type="password", placeholder="password")
         col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
             if st.button("Login", use_container_width=True):
@@ -155,124 +132,137 @@ if not st.session_state.logged_in:
                     st.success(f"Welcome, {username}!")
                     st.rerun()
                 else:
-                    st.error("Invalid username or password")
+                    st.error("Invalid credentials")
         st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
 
-# ------------------- Logout Button -------------------
-with st.container():
-    st.markdown(f'<div class="logout-btn">👤 Logged in as: <strong>{st.session_state.username}</strong></div>',
-                unsafe_allow_html=True)
-    if st.button("Logout", key="logout"):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.rerun()
+# -------------------------------------------------
+# LOGOUT BUTTON
+# -------------------------------------------------
+st.markdown(
+    f'<div class="logout-btn">Logged in as <strong>{st.session_state.username}</strong></div>',
+    unsafe_allow_html=True
+)
+if st.button("Logout", key="logout"):
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    st.rerun()
 
 
-# ------------------- Load Model & Encoders -------------------
+# -------------------------------------------------
+# Load model & encoders
+# -------------------------------------------------
 @st.cache_resource
-def load_model_and_encoders():
+def load_resources():
     model = joblib.load('XGB_model.pkl')
-    columns = ["Sex", "Housing", "Saving accounts", "Checking account"]
-    encoder = {col: joblib.load(f"{col}_encoder.pkl") for col in columns}
-    return model, encoder
+    cols = ["Sex", "Housing", "Saving accounts", "Checking account"]
+    enc = {c: joblib.load(f"{c}_encoder.pkl") for c in cols}
+    return model, enc
 
 
-model, encoder = load_model_and_encoders()
+model, encoder = load_resources()
 
-# ------------------- Title & Intro -------------------
-st.markdown('<h1 class="title">💳 Credit Risk Predictor</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Enter applicant details to predict credit risk</p>', unsafe_allow_html=True)
+# -------------------------------------------------
+# Header
+# -------------------------------------------------
+st.markdown('<h1 class="title">Credit Risk Predictor</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Enter applicant details to evaluate credit risk</p>', unsafe_allow_html=True)
 
-# ------------------- Sidebar Inputs -------------------
+# -------------------------------------------------
+# Sidebar – inputs
+# -------------------------------------------------
 with st.sidebar:
     st.header("Applicant Details")
 
-    with st.expander("Personal Info", expanded=True):
+    with st.expander("Personal", expanded=True):
         age = st.slider("Age", 18, 80, 30)
         sex = st.selectbox("Sex", ["male", "female"])
-        job = st.select_slider("Job Skill Level", options=[0, 1, 2, 3], value=1,
-                               format_func=lambda x: ["Unskilled", "Skilled", "Highly Skilled", "Management"][x])
+        job = st.select_slider(
+            "Job Skill", options=[0, 1, 2, 3], value=1,
+            format_func=lambda x: ["Unskilled", "Skilled", "Highly Skilled", "Management"][x]
+        )
 
-    with st.expander("Financial Status", expanded=True):
+    with st.expander("Financial", expanded=True):
         housing = st.selectbox("Housing", ["own", "rent", "free"])
-        saving_account = st.selectbox("Saving Accounts", ["little", "moderate", "quite rich", "rich"])
-        checking_account = st.selectbox("Checking Account", ["little", "moderate", "rich"])
+        saving = st.selectbox("Saving Accounts", ["little", "moderate", "quite rich", "rich"])
+        checking = st.selectbox("Checking Account", ["little", "moderate", "rich"])
 
-    with st.expander("Loan Details", expanded=True):
-        credit_amount = st.number_input("Credit Amount (€)", min_value=100, value=1000, step=100)
+    with st.expander("Loan", expanded=True):
+        credit_amount = st.number_input("Credit Amount (USD $)", min_value=100, value=1000, step=100)
         duration = st.number_input("Duration (Months)", min_value=3, max_value=72, value=12, step=3)
 
-# ------------------- Main Prediction Area -------------------
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
+# -------------------------------------------------
+# Main prediction area
+# -------------------------------------------------
+c1, c2, c3 = st.columns([1, 2, 1])
+with c2:
     st.markdown("### Risk Prediction")
-
     if st.button("Predict Credit Risk", use_container_width=True):
-        with st.spinner("Analyzing..."):
-            time.sleep(1.5)
-            progress_bar = st.progress(0)
+        with st.spinner("Analyzing…"):
+            time.sleep(1.2)  # light processing feel
+            prog = st.progress(0)
             for i in range(100):
-                time.sleep(0.01)
-                progress_bar.progress(i + 1)
+                time.sleep(0.008)
+                prog.progress(i + 1)
 
+        # Encode
         try:
-            input_data = {
+            inp = {
                 "Age": [age],
                 "Sex": [encoder["Sex"].transform([sex])[0]],
                 "Job": [job],
                 "Housing": [encoder["Housing"].transform([housing])[0]],
-                "Saving accounts": [encoder["Saving accounts"].transform([saving_account])[0]],
-                "Checking account": [encoder["Checking account"].transform([checking_account])[0]],
+                "Saving accounts": [encoder["Saving accounts"].transform([saving])[0]],
+                "Checking account": [encoder["Checking account"].transform([checking])[0]],
                 "Credit amount": [credit_amount],
                 "Duration": [duration]
             }
-            input_df = pd.DataFrame(input_data)
-            prediction = model.predict(input_df)[0]
-            proba = model.predict_proba(input_df)[0]
-            risk_prob = proba[1] if prediction == 1 else proba[0]
+            df = pd.DataFrame(inp)
 
-            if prediction == 1:
-                st.markdown(f'<div class="risk-good">GOOD RISK</div>', unsafe_allow_html=True)
-                st.balloons()
-            else:
-                st.markdown(f'<div class="risk-bad">BAD RISK</div>', unsafe_allow_html=True)
-                st.snow()
+            pred = model.predict(df)[0]
+            prob = model.predict_proba(df)[0]
+            conf = int((prob[1] if pred == 1 else prob[0]) * 100)
 
-            confidence = int(risk_prob * 100)
-            if prediction == 1:
-                st.success(f"**Good Risk Confidence: {confidence}%**")
+            if pred == 1:
+                st.markdown('<div class="risk-good">GOOD RISK</div>', unsafe_allow_html=True)
+                st.success(f"Confidence: **{conf}%**")
             else:
-                st.error(f"**Bad Risk Confidence: {confidence}%**")
-            st.progress(confidence / 100)
+                st.markdown('<div class="risk-bad">BAD RISK</div>', unsafe_allow_html=True)
+                st.error(f"Confidence: **{conf}%**")
+            st.progress(conf / 100)
 
         except Exception as e:
-            st.error(f"Prediction error: {str(e)}")
+            st.error(f"Prediction error: {e}")
 
-# ------------------- Summary Cards -------------------
+# -------------------------------------------------
+# Summary cards
+# -------------------------------------------------
 st.markdown("### Application Summary")
-summary_col1, summary_col2 = st.columns(2)
-with summary_col1:
+s1, s2 = st.columns(2)
+
+with s1:
     st.markdown(f"""
     <div class="metric-card">
         <strong>Applicant</strong><br>
-        {age} years old, {sex.title()}<br>
-        Job Level: {job} / 3
+        {age} yrs, {sex.title()}<br>
+        Job level {job}/3
     </div>
     """, unsafe_allow_html=True)
-with summary_col2:
+
+with s2:
     st.markdown(f"""
     <div class="metric-card">
         <strong>Loan</strong><br>
-        €{credit_amount:,} for {duration} months<br>
+        ${credit_amount:,} for {duration} months<br>
         Housing: {housing.title()}
     </div>
     """, unsafe_allow_html=True)
 
-# ------------------- Footer -------------------
+# -------------------------------------------------
+# Footer
+# -------------------------------------------------
 st.markdown("""
 <div class="footer">
-    Secured App by Bhupinder Singh @2025 | XGBoost + Streamlit
+    © 2025 Bhupinder Singh (for interview demo purposes)
 </div>
 """, unsafe_allow_html=True)
-
